@@ -2,7 +2,9 @@
 // MOBILE CONTEST WEBSITE - JAVASCRIPT FUNCTIONALITY
 // =============================================================================
 
-// Configuration
+// ============================================================================= 
+// CONFIGURATION & CONSTANTS
+// =============================================================================
 const ContestConfig = {
     // EmailJS Configuration - using same as portfolio
     emailjs: {
@@ -25,11 +27,16 @@ const ContestConfig = {
     }
 };
 
-// Global variables
+// =============================================================================
+// GLOBAL VARIABLES
+// =============================================================================
+
 let contestEntries = [];
 let isFirebaseReady = false;
 
-// Firebase Database Functions
+// =============================================================================
+// FIREBASE DATABASE FUNCTIONS
+// =============================================================================
 const FirebaseDB = {
     // Check if Firebase is available
     isReady() {
@@ -175,7 +182,10 @@ const FirebaseDB = {
     }
 };
 
-// Initialize when DOM is loaded
+// =============================================================================
+// INITIALIZATION & EVENT HANDLERS
+// =============================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🎉 Contest website loaded successfully!');
     console.log('💾 Storage System: Using localStorage + Firebase as storage backends');
@@ -306,7 +316,10 @@ function initFormHandling() {
     addRealTimeValidation();
 }
 
-// Handle form submission
+// =============================================================================
+// FORM HANDLING & SUBMISSION
+// =============================================================================
+
 async function handleFormSubmit(e) {
     e.preventDefault();
     console.log('📋 Form submitted!');
@@ -315,6 +328,10 @@ async function handleFormSubmit(e) {
     showLoading();
     
     try {
+        // Load latest entries to ensure duplicate check is accurate
+        console.log('📊 Loading latest entries for duplicate validation...');
+        await loadEntriesFromStorage();
+        
         // Get form data
         const formData = getFormData();
         console.log('📝 Form data:', formData);
@@ -384,7 +401,10 @@ function generateEntryId() {
     return 'CE' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
 }
 
-// Validate form data
+// =============================================================================
+// FORM VALIDATION FUNCTIONS
+// =============================================================================
+
 function validateForm(data) {
     let isValid = true;
     const errors = {};
@@ -401,6 +421,20 @@ function validateForm(data) {
             isValid = false;
         }
     });
+    
+    // Check for duplicate mobile number and IMEI
+    const duplicateCheck = checkForDuplicateEntry(data);
+    if (duplicateCheck.isDuplicate) {
+        if (duplicateCheck.duplicateField === 'mobile') {
+            errors.mobile = 'This mobile number is already registered in the contest';
+            showNotification('❌ This mobile number is already registered! Each mobile number can only be used once.', 'error');
+        }
+        if (duplicateCheck.duplicateField === 'imei') {
+            errors.imei = 'This IMEI number is already registered in the contest';
+            showNotification('❌ This IMEI number is already registered! Each device can only be used once.', 'error');
+        }
+        isValid = false;
+    }
     
     // Email validation
     if (data.email && !isValidEmail(data.email)) {
@@ -443,6 +477,56 @@ function validateForm(data) {
     displayValidationErrors(errors);
     
     return isValid;
+}
+
+// Check for duplicate mobile number or IMEI
+function checkForDuplicateEntry(newEntryData) {
+    console.log('🔍 Checking for duplicate mobile number or IMEI...');
+    
+    // Check all existing entries (from both localStorage and Firebase)
+    const existingEntries = contestEntries || [];
+    console.log(`📊 Checking against ${existingEntries.length} existing entries`);
+    
+    // Clean the new entry data for comparison
+    const newMobile = newEntryData.mobile ? newEntryData.mobile.replace(/\D/g, '') : '';
+    const newIMEI = newEntryData.imei ? newEntryData.imei.replace(/\D/g, '') : '';
+    
+    console.log(`🔍 New entry - Mobile: ${newMobile}, IMEI: ${newIMEI}`);
+    
+    for (let i = 0; i < existingEntries.length; i++) {
+        const entry = existingEntries[i];
+        
+        // Clean existing entry data for comparison
+        const existingMobile = entry.mobile ? entry.mobile.replace(/\D/g, '') : '';
+        const existingIMEI = entry.imei ? entry.imei.replace(/\D/g, '') : '';
+        
+        // Check mobile number duplicate
+        if (newMobile && existingMobile && newMobile === existingMobile) {
+            console.log(`❌ Duplicate mobile number found: ${newMobile} (Entry ID: ${entry.entryId})`);
+            return {
+                isDuplicate: true,
+                duplicateField: 'mobile',
+                existingEntry: entry
+            };
+        }
+        
+        // Check IMEI duplicate
+        if (newIMEI && existingIMEI && newIMEI === existingIMEI) {
+            console.log(`❌ Duplicate IMEI number found: ${newIMEI} (Entry ID: ${entry.entryId})`);
+            return {
+                isDuplicate: true,
+                duplicateField: 'imei',
+                existingEntry: entry
+            };
+        }
+    }
+    
+    console.log('✅ No duplicates found - entry can proceed');
+    return {
+        isDuplicate: false,
+        duplicateField: null,
+        existingEntry: null
+    };
 }
 
 // Validation helper functions
@@ -552,12 +636,26 @@ function validateField(field) {
                 if (!isValidMobile(value)) {
                     isValid = false;
                     errorMessage = 'Mobile number must be exactly 10 digits starting with 6, 7, 8, or 9';
+                } else {
+                    // Check for duplicate mobile number
+                    const duplicateCheck = checkForDuplicateEntry({ mobile: value, imei: '' });
+                    if (duplicateCheck.isDuplicate && duplicateCheck.duplicateField === 'mobile') {
+                        isValid = false;
+                        errorMessage = 'This mobile number is already registered in the contest';
+                    }
                 }
                 break;
             case 'imei':
                 if (!isValidIMEI(value)) {
                     isValid = false;
                     errorMessage = 'IMEI number must be exactly 15 digits';
+                } else {
+                    // Check for duplicate IMEI number
+                    const duplicateCheck = checkForDuplicateEntry({ mobile: '', imei: value });
+                    if (duplicateCheck.isDuplicate && duplicateCheck.duplicateField === 'imei') {
+                        isValid = false;
+                        errorMessage = 'This IMEI number is already registered in the contest';
+                    }
                 }
                 break;
             case 'pincode':
@@ -581,7 +679,10 @@ function validateField(field) {
     }
 }
 
-// Load entries from both localStorage and Firebase
+// =============================================================================
+// DATA MANAGEMENT & STORAGE
+// =============================================================================
+
 async function loadEntriesFromStorage() {
     console.log('📁 Loading entries from storage...');
     
@@ -919,7 +1020,10 @@ function generateCSV(entries) {
     return csvContent;
 }
 
-// Initialize success handling (simplified)
+// =============================================================================
+// UI FUNCTIONS & NOTIFICATIONS
+// =============================================================================
+
 function initSuccessModalHandling() {
     console.log('🎭 Success message system ready');
     // Nothing complex needed for the simple approach
@@ -1012,7 +1116,10 @@ function showNotificationWithMailto(message, mailtoLink, linkText) {
     });
 }
 
-// Initialize smooth scrolling
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
 function initSmoothScrolling() {
     const links = document.querySelectorAll('a[href^="#"]');
     
@@ -1084,7 +1191,10 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Debugging utilities
+// =============================================================================
+// DEBUG & TESTING FUNCTIONS
+// =============================================================================
+
 window.debugContestStorage = async function() {
     console.log('=== Contest Storage Debug ===');
     
@@ -1142,6 +1252,10 @@ window.clearContestStorage = async function() {
     }, 1500);
 };
 
+// =============================================================================
+// SCRIPT LOADED - DEBUG COMMANDS AVAILABLE
+// =============================================================================
+
 console.log('🎯 Contest JavaScript loaded successfully!');
 console.log('💡 Debug commands available:');
 console.log('  - debugContestStorage() - Show all stored entries');
@@ -1150,6 +1264,7 @@ console.log('  - testSuccessModal() - Test the success modal display');
 console.log('  - testFirebaseConnection() - Test Firebase connection');
 console.log('  - getFirebaseEntryCount() - Get entry count from Firebase');
 console.log('  - testFirebaseSave() - Test saving a dummy entry to Firebase');
+console.log('  - testDuplicateCheck() - Test duplicate mobile/IMEI validation');
 
 // Test function for debugging success modal
 window.testSuccessModal = function() {
@@ -1246,6 +1361,68 @@ window.testFirebaseSave = async function() {
         showNotification('Test Firebase save error ❌', 'error');
         return { success: false, error: error.message };
     }
+};
+
+window.testDuplicateCheck = function() {
+    console.log('🧪 Testing duplicate mobile/IMEI validation...');
+    
+    // Get current entries count
+    const currentCount = contestEntries.length;
+    console.log(`📊 Current entries: ${currentCount}`);
+    
+    if (currentCount === 0) {
+        console.log('⚠️ No existing entries to test against. Add some entries first.');
+        showNotification('No existing entries to test against', 'info');
+        return;
+    }
+    
+    // Get the first entry for testing
+    const firstEntry = contestEntries[0];
+    console.log('🔍 Testing with first entry data:', {
+        mobile: firstEntry.mobile,
+        imei: firstEntry.imei,
+        entryId: firstEntry.entryId
+    });
+    
+    // Test mobile duplicate
+    const mobileTest = checkForDuplicateEntry({
+        mobile: firstEntry.mobile,
+        imei: '999999999999999' // Different IMEI
+    });
+    
+    // Test IMEI duplicate
+    const imeiTest = checkForDuplicateEntry({
+        mobile: '9999999999', // Different mobile
+        imei: firstEntry.imei
+    });
+    
+    // Test no duplicate
+    const noDuplicateTest = checkForDuplicateEntry({
+        mobile: '9999999999',
+        imei: '999999999999999'
+    });
+    
+    console.log('📋 Test Results:');
+    console.log('  - Mobile duplicate:', mobileTest);
+    console.log('  - IMEI duplicate:', imeiTest);
+    console.log('  - No duplicate:', noDuplicateTest);
+    
+    // Show results
+    const results = `
+Duplicate Validation Test Results:
+✅ Mobile duplicate detection: ${mobileTest.isDuplicate ? 'WORKING' : 'FAILED'}
+✅ IMEI duplicate detection: ${imeiTest.isDuplicate ? 'WORKING' : 'FAILED'}
+✅ No duplicate detection: ${!noDuplicateTest.isDuplicate ? 'WORKING' : 'FAILED'}
+    `;
+    
+    console.log(results);
+    showNotification('Duplicate validation test completed! Check console for details.', 'success');
+    
+    return {
+        mobileTest,
+        imeiTest,
+        noDuplicateTest
+    };
 };
 
 // Simple success message - replaces form content
