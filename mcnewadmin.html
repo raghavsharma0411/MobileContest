@@ -60,263 +60,6 @@
     <!-- Styles -->
     <link rel="stylesheet" href="./style.css">
     
-    <style>
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-        
-        .admin-header p {
-            color: white !important;
-            opacity: 0.9;
-            margin: 0.5rem 0 0 0;
-        }
-        
-        .admin-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        
-        .admin-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .admin-card h3 {
-            color: #667eea;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            border: 2px solid rgba(102, 126, 234, 0.2);
-        }
-        
-        .stat-card h4 {
-            font-size: 2rem;
-            margin: 0;
-            color: #667eea;
-        }
-        
-        .stat-card p {
-            margin: 0.5rem 0 0 0;
-            color: #666;
-            font-weight: 500;
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .all-entries {
-            max-height: 600px;
-            overflow: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        /* Admin page table styling */
-        .all-entries table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-            font-size: 12px;
-            min-width: 1000px;
-        }
-        
-        .all-entries th {
-            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
-            color: white;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-size: 11px;
-        }
-        
-        .all-entries td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-        }
-        
-        .all-entries tr:nth-child(even) {
-            background-color: #fafbfc;
-        }
-        
-        .all-entries tr:hover {
-            background-color: #f0f4ff;
-        }
-        
-        .all-entries .entry-id {
-            font-family: 'Courier New', monospace;
-            background: #f1f3f4;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-        }
-        
-        .all-entries .mobile-tag {
-            background: #e3f2fd;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 500;
-        }
-        
-        .all-entries .email-link {
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        .all-entries .email-link:hover {
-            text-decoration: underline;
-        }
-        
-        .entries-count {
-            text-align: center;
-            padding: 1rem;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-bottom: 1px solid #e0e0e0;
-            font-weight: 600;
-            color: #667eea;
-        }
-        
-        .back-to-contest {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-        }
-        
-        @media (max-width: 768px) {
-            .admin-actions {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-            }
-            
-            .admin-actions .btn {
-                width: 100%;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .all-entries {
-                max-height: 400px;
-            }
-            
-            .all-entries table {
-                font-size: 10px;
-            }
-            
-            .all-entries th {
-                padding: 8px 6px;
-                font-size: 9px;
-            }
-            
-            .all-entries td {
-                padding: 8px 6px;
-            }
-        }
-        
-        /* Firebase Status Styles */
-        .firebase-status {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .storage-info {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .storage-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            min-width: 120px;
-        }
-        
-        .storage-item.connected {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-        
-        .storage-item.disconnected {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-        
-        .storage-total {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 6px;
-            font-weight: 600;
-            margin-left: auto;
-        }
-        
-        @media (max-width: 768px) {
-            .storage-info {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .storage-item,
-            .storage-total {
-                min-width: unset;
-                justify-content: center;
-            }
-            
-            .storage-total {
-                margin-left: 0;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Back to Contest Button -->
@@ -830,79 +573,14 @@
             return textContent;
         }
 
-        function formatCSVForEmail(entries, csvContent) {
-            const htmlTable = generateHTMLTable(entries);
-            
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
-        .header h1 { margin: 0 0 10px 0; font-size: 28px; }
-        .header p { margin: 0; opacity: 0.9; }
-        .summary { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-left: 5px solid #667eea; margin-bottom: 25px; border-radius: 8px; }
-        .summary h3 { margin-top: 0; color: #667eea; }
-        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13px; min-width: 1000px; }
-        th { background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%); color: white; padding: 15px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-        td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
-        tr:nth-child(even) { background-color: #fafbfc; }
-        tr:hover { background-color: #f0f4ff; }
-        .footer { margin-top: 30px; padding: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center; background: #f8f9fa; border-radius: 8px; }
-        .highlight { color: #667eea; font-weight: bold; }
-        .entry-count { font-size: 32px; font-weight: bold; color: #667eea; display: inline-block; background: white; padding: 5px 15px; border-radius: 25px; margin: 0 10px; }
-        .mobile-tag { background: #e3f2fd; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
-        .email-link { color: #667eea; text-decoration: none; }
-        .email-link:hover { text-decoration: underline; }
-        .entry-id { font-family: 'Courier New', monospace; background: #f1f3f4; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>📱 Contest Entries Export</h1>
-        <p>Complete data export from Contest Admin Panel</p>
-    </div>
-    
-    <div class="summary">
-        <h3>📊 Summary</h3>
-        <p><strong>Total Entries:</strong> <span class="entry-count">${entries.length}</span></p>
-        <p><strong>Export Date:</strong> ${new Date().toLocaleString()}</p>
-        <p><strong>Generated by:</strong> Contest Admin Panel</p>
-    </div>
-    
-    <h3>📋 All Contest Entries</h3>
-    <div class="table-container">
-        ${htmlTable}
-    </div>
-    
-    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
-        <h3 style="margin-top: 0; color: #667eea;">📄 Raw CSV Data</h3>
-        <p style="margin-bottom: 10px; color: #666; font-size: 14px;">Copy the data below for spreadsheet import:</p>
-        <div style="background: #ffffff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; overflow-x: auto;">
-            <pre style="margin: 0; font-family: 'Courier New', monospace; font-size: 12px; color: #333; white-space: pre-wrap; word-wrap: break-word;">${csvContent}</pre>
-        </div>
-        <p style="margin-top: 10px; margin-bottom: 0; color: #666; font-size: 12px;">
-            <strong>💡 Tip:</strong> You can copy this CSV data and paste it directly into Excel, Google Sheets, or any spreadsheet application.
-        </p>
-    </div>
-    
-    <div class="footer">
-        <p><strong>Contest Data Export</strong></p>
-        <p>This email contains both a formatted HTML table and raw CSV data for maximum flexibility.<br>
-        For any questions, please contact the contest administrator.</p>
-        <p><em>Export ID: ${Date.now()} | Entries: ${entries.length} | Format: HTML + CSV</em></p>
-    </div>
-</body>
-</html>
-            `.trim();
-            
-            return htmlContent;
+        // Removed - This function was unused and created complex HTML for email (replaced by text format)
+
+        // Consolidated table generation function
+        function generateHTMLTableForEmail(entries) {
+            return generateHTMLTable(entries, true); // Use main function with email styling flag
         }
 
-        function generateHTMLTableForEmail(entries) {
-            // Generate table for EmailJS template (simplified styling)
+        function generateHTMLTable(entries, isEmail = false) {
             if (entries.length === 0) {
                 return '<p style="text-align: center; color: #666; padding: 20px;">No contest entries found.</p>';
             }
@@ -913,12 +591,20 @@
                 'Country', 'PIN Code', 'Date', 'Time'
             ];
 
-            let tableHTML = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px;">';
+            const tableStyle = isEmail ? 
+                'style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px;"' : '';
+            const headerStyle = isEmail ? 
+                'style="background: #667eea; color: white; padding: 10px 8px; text-align: left; font-weight: 600; font-size: 11px;"' : '';
+            
+            let tableHTML = isEmail ? 
+                `<div style="overflow-x: auto;"><table ${tableStyle}>` : '<table>';
             
             // Table headers
             tableHTML += '<thead><tr>';
             headers.forEach(header => {
-                tableHTML += `<th style="background: #667eea; color: white; padding: 10px 8px; text-align: left; font-weight: 600; font-size: 11px;">${header}</th>`;
+                tableHTML += isEmail ? 
+                    `<th ${headerStyle}>${header}</th>` : 
+                    `<th>${header}</th>`;
             });
             tableHTML += '</tr></thead>';
             
@@ -929,79 +615,45 @@
                 const formattedDate = formatDate(submissionDate);
                 const formattedTime = formatTime(submissionDate);
                 
-                const rowBg = index % 2 === 0 ? '#fafbfc' : '#ffffff';
-                
-                tableHTML += `<tr style="background-color: ${rowBg};">`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px; background: #f1f3f4; border-radius: 3px;">${entry.entryId}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.firstName}</strong></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.lastName}</strong></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.mobile}</strong></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${entry.email}" style="color: #667eea; text-decoration: none;">${entry.email}</a></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><span style="background: #e3f2fd; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${entry.mobileModel}</span></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px;">${entry.imei}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-size: 11px;">${entry.address}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.city}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.state}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.country}</td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.pincode}</strong></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #667eea;"><strong>${formattedDate}</strong></td>`;
-                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">${formattedTime}</td>`;
+                if (isEmail) {
+                    const rowBg = index % 2 === 0 ? '#fafbfc' : '#ffffff';
+                    tableHTML += `<tr style="background-color: ${rowBg};">`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px;">${entry.entryId}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.firstName}</strong></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.lastName}</strong></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.mobile}</strong></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${entry.email}" style="color: #667eea; text-decoration: none;">${entry.email}</a></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><span style="background: #e3f2fd; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${entry.mobileModel}</span></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px;">${entry.imei}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-size: 11px;">${entry.address}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.city}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.state}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.country}</td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.pincode}</strong></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #667eea;"><strong>${formattedDate}</strong></td>`;
+                    tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">${formattedTime}</td>`;
+                } else {
+                    tableHTML += '<tr>';
+                    tableHTML += `<td><span class="entry-id">${entry.entryId}</span></td>`;
+                    tableHTML += `<td><strong>${entry.firstName}</strong></td>`;
+                    tableHTML += `<td><strong>${entry.lastName}</strong></td>`;
+                    tableHTML += `<td><strong>${entry.mobile}</strong></td>`;
+                    tableHTML += `<td><a href="mailto:${entry.email}" class="email-link">${entry.email}</a></td>`;
+                    tableHTML += `<td><span class="mobile-tag">${entry.mobileModel}</span></td>`;
+                    tableHTML += `<td><code style="font-size: 11px; background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">${entry.imei}</code></td>`;
+                    tableHTML += `<td><small>${entry.address}</small></td>`;
+                    tableHTML += `<td>${entry.city}</td>`;
+                    tableHTML += `<td>${entry.state}</td>`;
+                    tableHTML += `<td>${entry.country}</td>`;
+                    tableHTML += `<td><strong>${entry.pincode}</strong></td>`;
+                    tableHTML += `<td><strong style="color: #667eea;">${formattedDate}</strong></td>`;
+                    tableHTML += `<td style="color: #666;">${formattedTime}</td>`;
+                }
                 tableHTML += '</tr>';
             });
             tableHTML += '</tbody>';
             
-            tableHTML += '</table></div>';
-            
-            return tableHTML;
-        }
-
-        function generateHTMLTable(entries) {
-            if (entries.length === 0) {
-                return '<p style="text-align: center; color: #666; padding: 20px;">No contest entries found.</p>';
-            }
-
-            const headers = [
-                'Entry ID', 'First Name', 'Last Name', 'Mobile', 'Email',
-                'Mobile Model', 'IMEI', 'Address', 'City', 'State',
-                'Country', 'PIN Code', 'Date', 'Time'
-            ];
-
-            let tableHTML = '<table>';
-            
-            // Table headers
-            tableHTML += '<thead><tr>';
-            headers.forEach(header => {
-                tableHTML += `<th>${header}</th>`;
-            });
-            tableHTML += '</tr></thead>';
-            
-            // Table body
-            tableHTML += '<tbody>';
-            entries.forEach(entry => {
-                const submissionDate = new Date(entry.submissionDate);
-                const formattedDate = formatDate(submissionDate);
-                const formattedTime = formatTime(submissionDate);
-                
-                tableHTML += '<tr>';
-                tableHTML += `<td><span class="entry-id">${entry.entryId}</span></td>`;
-                tableHTML += `<td><strong>${entry.firstName}</strong></td>`;
-                tableHTML += `<td><strong>${entry.lastName}</strong></td>`;
-                tableHTML += `<td><strong>${entry.mobile}</strong></td>`;
-                tableHTML += `<td><a href="mailto:${entry.email}" class="email-link">${entry.email}</a></td>`;
-                tableHTML += `<td><span class="mobile-tag">${entry.mobileModel}</span></td>`;
-                tableHTML += `<td><code style="font-size: 11px; background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">${entry.imei}</code></td>`;
-                tableHTML += `<td><small>${entry.address}</small></td>`;
-                tableHTML += `<td>${entry.city}</td>`;
-                tableHTML += `<td>${entry.state}</td>`;
-                tableHTML += `<td>${entry.country}</td>`;
-                tableHTML += `<td><strong>${entry.pincode}</strong></td>`;
-                tableHTML += `<td><strong style="color: #667eea;">${formattedDate}</strong></td>`;
-                tableHTML += `<td style="color: #666;">${formattedTime}</td>`;
-                tableHTML += '</tr>';
-            });
-            tableHTML += '</tbody>';
-            
-            tableHTML += '</table>';
+            tableHTML += isEmail ? '</table></div>' : '</table>';
             
             return tableHTML;
         }
