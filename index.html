@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Purchase Contest - Win Big!</title>
+    <meta name="description" content="Participate in our exclusive mobile purchase contest. Enter your details for a chance to win exciting prizes!">
+    <meta name="keywords" content="mobile contest, smartphone contest, mobile phone prizes, contest form">
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import { getDatabase, ref, push, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+      
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAzDgYOYXbITMZyDicGl7Ia2-4tRmX0VjQ",
+        authDomain: "mobilecontest-bbbc5.firebaseapp.com",
+        databaseURL: "https://mobilecontest-bbbc5-default-rtdb.firebaseio.com",
+        projectId: "mobilecontest-bbbc5",
+        storageBucket: "mobilecontest-bbbc5.firebasestorage.app",
+        messagingSenderId: "651506288824",
+        appId: "1:651506288824:web:f3e3eb21b4f7f297934c4d"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally
+      window.firebaseApp = app;
+      window.firebaseDatabase = database;
+      window.firebaseRef = ref;
+      window.firebasePush = push;
+      window.firebaseSet = set;
+      window.firebaseGet = get;
+      window.firebaseChild = child;
+      
+      // Set Firebase ready flag
+      window.firebaseReady = true;
+      
+      console.log('🔥 Firebase initialized successfully and ready');
+      
+      // Dispatch custom event to notify Firebase is ready
+      window.dispatchEvent(new CustomEvent('firebaseReady', { 
+        detail: { database, ref, push, set, get, child } 
+      }));
+    </script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Mobile Contest</span>
+                </div>
+                <nav class="nav">
+                    <a href="#contest" class="nav-link">Contest</a>
+                    <!-- <a href="#prizes" class="nav-link">Prizes</a> -->
+                    <!-- <a href="#rules" class="nav-link">Rules</a> -->
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        🎉 Mobile Purchase <span class="highlight">Contest</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Just bought a new mobile? Enter our exclusive contest and win amazing prizes!
+                    </p>
+                    <div class="hero-features">
+                        <div class="feature">
+                            <i class="fas fa-gift"></i>
+                            <span>Exciting Prizes</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-clock"></i>
+                            <span>Quick Entry</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure & Safe</span>
+                        </div>
+                    </div>
+                    <a href="#contest" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Enter Contest Now
+                    </a>
+                </div>
+                <div class="hero-image">
+                    <div class="phone-mockup">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prizes Section -->
+    <!-- <section id="prizes" class="prizes">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Amazing Prizes Await!</h2>
+                <p class="section-subtitle">What you could win</p>
+            </div>
+            <div class="prizes-grid">
+                <div class="prize-card">
+                    <div class="prize-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>1st Prize</h3>
+                    <p>₹25,000 Cash Prize</p>
+                </div>
+                <div class="prize-card">
+                    <div class="prize-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3>2nd Prize</h3>
+                    <p>Latest Smartwatch</p>
+                </div>
+                <div class="prize-card">
+                    <div class="prize-icon">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <h3>3rd Prize</h3>
+                    <p>Premium Headphones</p>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Contest Form Section -->
+    <section id="contest" class="contest-form-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Enter the Contest</h2>
+                <p class="section-subtitle">Fill in your details to participate</p>
+            </div>
+            
+            
+            <div class="form-container">
+                <form id="contestForm" class="contest-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name <span class="required-asterisk">*</span></label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name <span class="required-asterisk">*</span></label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mobile">Mobile Number <span class="required-asterisk">*</span></label>
+                            <input type="tel" id="mobile" name="mobile" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10 digits (e.g., 9876543210)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required-asterisk">*</span></label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mobileModel">Mobile Model <span class="required-asterisk">*</span></label>
+                            <input type="text" id="mobileModel" name="mobileModel" placeholder="e.g., Vivo V60 5G" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="imei">IMEI Number <span class="required-asterisk">*</span></label>
+                            <input type="text" id="imei" name="imei" pattern="[0-9]{15}" maxlength="15" placeholder="15 digits (dial *#06# to find)" required>
+                            <small>Must be exactly 15 digits</small>
+                        </div>
+                    </div>
+                    
+                    <div class="address-section">
+                        <h3>Address Details</h3>
+                        <!-- <div class="address-help">
+                            <p><i class="fas fa-info-circle"></i> Please fill each field carefully with correct information</p>
+                        </div> -->
+                        <div class="form-group">
+                            <label for="address">Full Address <span class="required-asterisk">*</span></label>
+                            <textarea id="address" name="address" rows="3" placeholder="Street address, Building name, Area (e.g., 123 MG Road, ICC TECHNOLOGY Building, Bandra West)" required></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City <span class="required-asterisk">*</span></label>
+                                <input type="text" id="city" name="city" placeholder="e.g., Mumbai, Delhi, Pune" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State <span class="required-asterisk">*</span></label>
+                                <select id="state" name="state" required>
+                                    <option value="">Select State</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                    <option value="Assam">Assam</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                    <option value="Goa">Goa</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                    <option value="Jharkhand">Jharkhand</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Manipur">Manipur</option>
+                                    <option value="Meghalaya">Meghalaya</option>
+                                    <option value="Mizoram">Mizoram</option>
+                                    <option value="Nagaland">Nagaland</option>
+                                    <option value="Odisha">Odisha</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Sikkim">Sikkim</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Tripura">Tripura</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Uttarakhand">Uttarakhand</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                    <optgroup label="Union Territories">
+                                        <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                        <option value="Chandigarh">Chandigarh</option>
+                                        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                        <option value="Ladakh">Ladakh</option>
+                                        <option value="Lakshadweep">Lakshadweep</option>
+                                        <option value="Puducherry">Puducherry</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="country">Country <span class="required-asterisk">*</span></label>
+                                <input type="text" id="country" name="country" value="India" placeholder="Country name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pincode">PIN Code <span class="required-asterisk">*</span></label>
+                                <input type="text" id="pincode" name="pincode" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits (e.g., 400050)" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Entry
+                        </button>
+                        <button type="button" id="emailBtn" class="btn btn-secondary" style="display: none;">
+                            <i class="fas fa-envelope"></i>
+                            Send via Email
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message" style="display: none;">
+                    <div class="success-content">
+                        <div class="celebration-animation">
+                            <div class="celebration-emoji">🎉</div>
+                            <div class="celebration-emoji">🎊</div>
+                            <div class="celebration-emoji">✨</div>
+                            <div class="celebration-emoji">🎁</div>
+                        </div>
+                        <i class="fas fa-trophy success-icon"></i>
+                        <h2 class="success-title">🎉 CONGRATULATIONS! 🎉</h2>
+                        <h3 class="success-subtitle">You're Now in the Contest!</h3>
+                        <div class="success-message-text">
+                            <p class="big-text">📱 Your mobile purchase contest entry has been <strong>successfully submitted</strong>!</p>
+                            <div class="prize-reminder">
+                                <h4>🏆 What's Next?</h4>
+                                <div class="next-steps">
+                                    <div class="step">
+                                        <span class="step-icon">✅</span>
+                                        <span>Your entry is confirmed and recorded</span>
+                                    </div>
+                                    <div class="step">
+                                        <span class="step-icon">🎯</span>
+                                        <span>Contest results will be announced soon</span>
+                                    </div>
+                                    <div class="step">
+                                        <span class="step-icon">📞</span>
+                                        <span>Winners will be contacted directly</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="good-luck-message">
+                            <h3>🍀 BEST OF LUCK! 🍀</h3>
+                            <p>Stay tuned for the exciting results!</p>
+                            <div class="prize-emojis">
+                                <span>🏆</span><span>💰</span><span>⌚</span><span>🎧</span>
+                            </div>
+                        </div>
+                        
+                        <div class="final-message">
+                            <p><em>Thank you for participating in our mobile purchase contest!</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules Section -->
+    <!-- <section id="rules" class="rules">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Contest Rules</h2>
+                <p class="section-subtitle">Important guidelines</p>
+            </div>
+            <div class="rules-content">
+                <div class="rule-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div>
+                        <h4>Purchase Requirement</h4>
+                        <p>Must have purchased a mobile phone in the last 30 days</p>
+                    </div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-id-card"></i>
+                    <div>
+                        <h4>Valid Information</h4>
+                        <p>All provided information must be accurate and verifiable</p>
+                    </div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-calendar"></i>
+                    <div>
+                        <h4>Contest Period</h4>
+                        <p>Contest runs until December 31, 2025</p>
+                    </div>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-user-check"></i>
+                    <div>
+                        <h4>Eligibility</h4>
+                        <p>Open to residents of India, age 18 and above</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Mobile Contest. All rights reserved.</p>
+                <p>Contest organized with ❤️ for mobile enthusiasts</p>
+                <p style="margin-top: 1rem;"><small><a href="./admin.html" style="color: rgba(255,255,255,0.5); text-decoration: none;">Admin</a></small></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing your entry...</p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Admin Panel - Mobile Contest</title>
+    <meta name="description" content="Admin panel for mobile purchase contest management">
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import { getDatabase, ref, push, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+      
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAzDgYOYXbITMZyDicGl7Ia2-4tRmX0VjQ",
+        authDomain: "mobilecontest-bbbc5.firebaseapp.com",
+        databaseURL: "https://mobilecontest-bbbc5-default-rtdb.firebaseio.com",
+        projectId: "mobilecontest-bbbc5",
+        storageBucket: "mobilecontest-bbbc5.firebasestorage.app",
+        messagingSenderId: "651506288824",
+        appId: "1:651506288824:web:f3e3eb21b4f7f297934c4d"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      
+      // Make Firebase available globally
+      window.firebaseApp = app;
+      window.firebaseDatabase = database;
+      window.firebaseRef = ref;
+      window.firebasePush = push;
+      window.firebaseSet = set;
+      window.firebaseGet = get;
+      window.firebaseChild = child;
+      window.firebaseRemove = remove;
+      
+      // Set Firebase ready flag
+      window.firebaseReady = true;
+      
+      console.log('🔥 Firebase initialized successfully for admin panel and ready');
+      
+      // Dispatch custom event to notify Firebase is ready
+      window.dispatchEvent(new CustomEvent('firebaseReady', { 
+        detail: { database, ref, push, set, get, child, remove } 
+      }));
+    </script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="./style.css">
+    
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .admin-header p {
+            color: white !important;
+            opacity: 0.9;
+            margin: 0.5rem 0 0 0;
+        }
+        
+        .admin-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .stat-card h4 {
+            font-size: 2rem;
+            margin: 0;
+            color: #667eea;
+        }
+        
+        .stat-card p {
+            margin: 0.5rem 0 0 0;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .all-entries {
+            max-height: 600px;
+            overflow: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Admin page table styling */
+        .all-entries table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            font-size: 12px;
+            min-width: 1000px;
+        }
+        
+        .all-entries th {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 11px;
+        }
+        
+        .all-entries td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .all-entries tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+        
+        .all-entries tr:hover {
+            background-color: #f0f4ff;
+        }
+        
+        .all-entries .entry-id {
+            font-family: 'Courier New', monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        
+        .all-entries .mobile-tag {
+            background: #e3f2fd;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .all-entries .email-link {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .all-entries .email-link:hover {
+            text-decoration: underline;
+        }
+        
+        .entries-count {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .back-to-contest {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            
+            .admin-actions .btn {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .all-entries {
+                max-height: 400px;
+            }
+            
+            .all-entries table {
+                font-size: 10px;
+            }
+            
+            .all-entries th {
+                padding: 8px 6px;
+                font-size: 9px;
+            }
+            
+            .all-entries td {
+                padding: 8px 6px;
+            }
+        }
+        
+        /* Firebase Status Styles */
+        .firebase-status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .storage-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .storage-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 120px;
+        }
+        
+        .storage-item.connected {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .storage-item.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .storage-total {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .storage-info {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .storage-item,
+            .storage-total {
+                min-width: unset;
+                justify-content: center;
+            }
+            
+            .storage-total {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Contest Button -->
+    <a href="./index.html" class="back-to-contest btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Back to Contest
+    </a>
+
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="container">
+            <h1><i class="fas fa-shield-alt"></i> Contest Admin Panel</h1>
+            <p>Manage mobile purchase contest entries and data</p>
+        </div>
+    </header>
+
+    <!-- Admin Content -->
+    <div class="admin-container">
+        <!-- Statistics -->
+        <div class="admin-card">
+            <h3><i class="fas fa-chart-bar"></i> Contest Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4 id="totalEntries">0</h4>
+                    <p>Total Entries</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="todayEntries">0</h4>
+                    <p>Today's Entries</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="lastEntryTime">-</h4>
+                    <p>Last Entry</p>
+                </div>
+            </div>
+            
+            <!-- Firebase Status -->
+            <div class="firebase-status">
+                <div class="storage-info">
+                    <div class="storage-item disconnected">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading storage status...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="admin-card">
+            <h3><i class="fas fa-database"></i> Data Management</h3>
+            <div class="admin-actions">
+                <button id="downloadCsvBtn" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Download All Entries CSV
+                </button>
+                <button id="emailCsvBtn" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i>
+                    Email Table + CSV
+                </button>
+                <button id="refreshDataBtn" class="btn btn-secondary">
+                    <i class="fas fa-sync"></i>
+                    Refresh Data
+                </button>
+                <button id="clearAllDataBtn" class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear All Data
+                </button>
+            </div>
+            <div class="csv-info" style="margin-top: 1.5rem; padding: 1rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
+                <p><i class="fas fa-info-circle"></i> <strong>Data Export Options (Firebase + localStorage):</strong></p>
+                <ul style="margin: 0.5rem 0 0 1.25rem; color: #666;">
+                    <li><strong>Download:</strong> Get CSV file with all contest entries from Firebase + localStorage for spreadsheet use</li>
+                    <li><strong>Email:</strong> Send formatted text summary + complete CSV data to raghavsharma0411@gmail.com</li>
+                    <li>Both options contain merged data from cloud (Firebase) and local storage with duplicate prevention</li>
+                    <li><em>Email includes: Professional summary with recent entries + Complete CSV data for spreadsheet import</em></li>
+                    <li><small><strong>Firebase:</strong> Real-time cloud database for persistent, accessible storage</small></li>
+                    <li><small><strong>Note:</strong> Uses clean text format for maximum email client compatibility</small></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- All Entries -->
+        <div class="admin-card">
+            <h3><i class="fas fa-table"></i> All Contest Entries</h3>
+            <div style="margin-bottom: 1rem;">
+                <input type="text" id="searchEntries" placeholder="🔍 Search entries by name, email, or mobile..." 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+            </div>
+            <div id="allEntries" class="all-entries">
+                <p style="text-align: center; color: #666; padding: 2rem;">No entries found. Start by collecting contest entries!</p>
+            </div>
+        </div>
+
+        <!-- Debug Tools -->
+        <div class="admin-card">
+            <h3><i class="fas fa-bug"></i> Debug Tools</h3>
+            <p>Open browser console (F12) and use these commands:</p>
+            <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; font-family: monospace; margin-bottom: 1rem;">
+                <div><strong>debugContestStorage()</strong> - View all stored entries (Firebase + localStorage)</div>
+                <div><strong>clearContestStorage()</strong> - Clear all data and reload</div>
+            </div>
+            
+            <h4 style="color: #f59e0b; margin-bottom: 0.5rem;"><i class="fas fa-fire"></i> Firebase Debug Commands:</h4>
+            <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; font-family: monospace;">
+                <div><strong>testFirebaseConnection()</strong> - Test Firebase connection and entry count</div>
+                <div><strong>testFirebaseSave()</strong> - Save a test entry to Firebase</div>
+                <div><strong>getFirebaseEntryCount()</strong> - Get current Firebase entry count</div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; font-size: 12px;">
+                <p style="margin: 0; color: #667eea;"><strong>📧 EmailJS Template:</strong></p>
+                <p style="margin: 5px 0 0 0; color: #666;">Email functionality requires custom EmailJS template configuration. Template variables: {{title}}, {{name}}, {{time}}, {{message}}, {{entry_count}}, {{export_date}}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script>
+        // Helper functions for date/time formatting
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function formatTime(date) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Admin-specific functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔐 Admin panel loaded');
+            
+            // Initialize admin panel
+            initAdminPanel();
+            
+            // Set up event listeners
+            document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSVFile);
+            document.getElementById('emailCsvBtn').addEventListener('click', emailCSVData);
+            document.getElementById('refreshDataBtn').addEventListener('click', refreshAdminData);
+            document.getElementById('clearAllDataBtn').addEventListener('click', clearAllContestData);
+            
+            // Set up search functionality
+            document.getElementById('searchEntries').addEventListener('input', function(e) {
+                filterEntries(e.target.value);
+            });
+        });
+
+        function initAdminPanel() {
+            refreshAdminData();
+        }
+
+        async function refreshAdminData() {
+            console.log('🔄 Refreshing admin data from Firebase + localStorage...');
+            
+            // Show loading state
+            const allEntriesDiv = document.getElementById('allEntries');
+            if (allEntriesDiv) {
+                allEntriesDiv.innerHTML = '<p style="text-align: center; color: #667eea; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading data from Firebase + localStorage...</p>';
+            }
+            
+            try {
+                // Load data from both Firebase and localStorage
+                console.log('📊 Loading entries from all sources...');
+                await loadEntriesFromStorage(); // This merges Firebase + localStorage data
+                
+                const entries = contestEntries || [];
+                console.log(`📊 Admin panel loaded ${entries.length} total entries (Firebase + localStorage)`);
+                
+                // Update statistics with Firebase data
+                await updateStatistics(entries);
+                
+                // Update all entries display
+                updateAllEntries(entries);
+                
+                // Show refresh notification with Firebase status
+                const firebaseStatus = FirebaseDB.isReady() ? '🔥 Firebase connected' : '📱 localStorage only';
+                showNotification(`Admin panel refreshed! Found ${entries.length} entries (${firebaseStatus}) 🔄`, 'success');
+                
+            } catch (error) {
+                console.error('❌ Error refreshing admin data:', error);
+                
+                // Fallback to localStorage only
+                try {
+                    const storedData = localStorage.getItem('contestEntries');
+                    const entries = storedData ? JSON.parse(storedData) : [];
+                    
+                    updateStatistics(entries);
+                    updateAllEntries(entries);
+                    
+                    showNotification(`Loaded ${entries.length} entries from localStorage only (Firebase failed) 📱`, 'warning');
+                } catch (fallbackError) {
+                    console.error('❌ Even localStorage fallback failed:', fallbackError);
+                    if (allEntriesDiv) {
+                        allEntriesDiv.innerHTML = '<p style="text-align: center; color: #ef4444; padding: 2rem;">❌ Error loading data. Check console for details.</p>';
+                    }
+                    showNotification('Error loading data. Check console for details. ❌', 'error');
+                }
+            }
+        }
+
+        async function updateStatistics(entries) {
+            const totalEntries = entries.length;
+            document.getElementById('totalEntries').textContent = totalEntries;
+
+            // Calculate today's entries
+            const today = new Date().toDateString();
+            const todayEntries = entries.filter(entry => {
+                const entryDate = new Date(entry.submissionDate).toDateString();
+                return entryDate === today;
+            }).length;
+            document.getElementById('todayEntries').textContent = todayEntries;
+
+            // Last entry time
+            if (entries.length > 0) {
+                // Sort entries by submission date to get the actual latest entry
+                const sortedEntries = entries.sort((a, b) => new Date(b.submissionDate) - new Date(a.submissionDate));
+                const lastEntry = sortedEntries[0];
+                const lastTime = new Date(lastEntry.submissionDate);
+                document.getElementById('lastEntryTime').textContent = lastTime.toLocaleString();
+            } else {
+                document.getElementById('lastEntryTime').textContent = '-';
+            }
+            
+            // Update Firebase status indicator
+            try {
+                const firebaseCount = await FirebaseDB.getEntryCount();
+                const localCount = JSON.parse(localStorage.getItem('contestEntries') || '[]').length;
+                
+                const statusElement = document.querySelector('.firebase-status');
+                if (statusElement) {
+                    const isFirebaseReady = FirebaseDB.isReady();
+                    statusElement.innerHTML = `
+                        <div class="storage-info">
+                            <div class="storage-item ${isFirebaseReady ? 'connected' : 'disconnected'}">
+                                <i class="fas fa-cloud${isFirebaseReady ? '' : '-slash'}"></i>
+                                Firebase: ${isFirebaseReady ? firebaseCount : 'Offline'}
+                            </div>
+                            <div class="storage-item connected">
+                                <i class="fas fa-hdd"></i>
+                                localStorage: ${localCount}
+                            </div>
+                            <div class="storage-total">
+                                <i class="fas fa-database"></i>
+                                Total: ${totalEntries}
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error updating Firebase status:', error);
+            }
+        }
+
+        function updateAllEntries(entries) {
+            const allEntriesDiv = document.getElementById('allEntries');
+            
+            if (entries.length === 0) {
+                allEntriesDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No entries found. Start by collecting contest entries!</p>';
+                return;
+            }
+
+            // Generate the same HTML table as used in emails
+            const htmlTable = generateHTMLTableForAdmin(entries);
+            
+            const totalEntries = contestEntries ? contestEntries.length : JSON.parse(localStorage.getItem('contestEntries') || '[]').length;
+            const searchTerm = document.getElementById('searchEntries').value.trim();
+            const isFiltered = searchTerm !== '';
+            
+            allEntriesDiv.innerHTML = `
+                <div class="entries-count">
+                    📊 ${isFiltered ? 
+                        `Found ${entries.length} of ${totalEntries} entries matching "${searchTerm}"` : 
+                        `Showing all ${entries.length} contest entries`
+                    } (most recent first)
+                    <button onclick="scrollTableToTop()" style="float: right; background: #667eea; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">
+                        ↑ Top
+                    </button>
+                </div>
+                ${htmlTable}
+            `;
+        }
+
+        function scrollTableToTop() {
+            const allEntriesDiv = document.getElementById('allEntries');
+            allEntriesDiv.scrollTop = 0;
+        }
+
+        function filterEntries(searchTerm) {
+            // Use the merged data from Firebase + localStorage
+            const allEntries = contestEntries || [];
+            
+            if (!searchTerm.trim()) {
+                // Show all entries if search is empty
+                updateAllEntries(allEntries);
+                return;
+            }
+            
+            // Filter entries based on search term
+            const filteredEntries = allEntries.filter(entry => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                    (entry.firstName || '').toLowerCase().includes(searchLower) ||
+                    (entry.lastName || '').toLowerCase().includes(searchLower) ||
+                    (entry.email || '').toLowerCase().includes(searchLower) ||
+                    (entry.mobile || '').includes(searchTerm) ||
+                    (entry.mobileModel || '').toLowerCase().includes(searchLower) ||
+                    (entry.city || '').toLowerCase().includes(searchLower) ||
+                    (entry.state || '').toLowerCase().includes(searchLower) ||
+                    (entry.entryId || '').toLowerCase().includes(searchLower)
+                );
+            });
+            
+            console.log(`🔍 Search "${searchTerm}" found ${filteredEntries.length} results from ${allEntries.length} total entries (Firebase + localStorage)`);
+            updateAllEntries(filteredEntries);
+        }
+
+        function generateHTMLTableForAdmin(entries) {
+            if (entries.length === 0) {
+                return '<p style="text-align: center; color: #666; padding: 20px;">No contest entries found.</p>';
+            }
+
+            const headers = [
+                'Entry ID', 'First Name', 'Last Name', 'Mobile', 'Email',
+                'Mobile Model', 'IMEI', 'Address', 'City', 'State',
+                'Country', 'PIN Code', 'Date', 'Time'
+            ];
+
+            let tableHTML = '<table>';
+            
+            // Table headers
+            tableHTML += '<thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            // Table body - show most recent entries first
+            tableHTML += '<tbody>';
+            const sortedEntries = entries.slice().reverse(); // Most recent first
+            
+            sortedEntries.forEach(entry => {
+                const submissionDate = new Date(entry.submissionDate);
+                const formattedDate = formatDate(submissionDate);
+                const formattedTime = formatTime(submissionDate);
+                
+                tableHTML += '<tr>';
+                tableHTML += `<td><span class="entry-id">${entry.entryId}</span></td>`;
+                tableHTML += `<td><strong>${entry.firstName}</strong></td>`;
+                tableHTML += `<td><strong>${entry.lastName}</strong></td>`;
+                tableHTML += `<td><strong>${entry.mobile}</strong></td>`;
+                tableHTML += `<td><a href="mailto:${entry.email}" class="email-link">${entry.email}</a></td>`;
+                tableHTML += `<td><span class="mobile-tag">${entry.mobileModel}</span></td>`;
+                tableHTML += `<td><code style="font-size: 10px; background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">${entry.imei}</code></td>`;
+                tableHTML += `<td><small>${entry.address}</small></td>`;
+                tableHTML += `<td>${entry.city}</td>`;
+                tableHTML += `<td>${entry.state}</td>`;
+                tableHTML += `<td>${entry.country}</td>`;
+                tableHTML += `<td><strong>${entry.pincode}</strong></td>`;
+                tableHTML += `<td><strong style="color: #667eea;">${formattedDate}</strong></td>`;
+                tableHTML += `<td style="color: #666;">${formattedTime}</td>`;
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody>';
+            
+            tableHTML += '</table>';
+            
+            return tableHTML;
+        }
+
+        async function clearAllContestData() {
+            // Get total entries from merged data
+            const entries = contestEntries || JSON.parse(localStorage.getItem('contestEntries')) || [];
+            
+            if (entries.length === 0) {
+                showNotification('No data to clear', 'info');
+                return;
+            }
+
+            if (confirm(`⚠️ Are you sure you want to delete ALL ${entries.length} contest entries from both Firebase and localStorage? This action cannot be undone!`)) {
+                
+                // Use the clearContestStorage function from script.js which handles both Firebase and localStorage
+                try {
+                    await clearContestStorage();
+                    console.log('🗑️ All contest data cleared by admin (Firebase + localStorage)');
+                } catch (error) {
+                    console.error('❌ Error clearing contest data:', error);
+                    showNotification('Error clearing data. Check console for details. ❌', 'error');
+                }
+            }
+        }
+
+        async function emailCSVData() {
+            console.log('📧 Starting email CSV process...');
+            
+            const emailBtn = document.getElementById('emailCsvBtn');
+            const originalText = emailBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                emailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                emailBtn.disabled = true;
+                
+                // Get all entries from Firebase + localStorage
+                await loadEntriesFromStorage(); // Load and merge data from both sources
+                const entries = contestEntries || [];
+                
+                if (entries.length === 0) {
+                    showNotification('No contest entries to send', 'error');
+                    return;
+                }
+                
+                // Log data sources
+                const firebaseCount = await FirebaseDB.getEntryCount();
+                const localCount = JSON.parse(localStorage.getItem('contestEntries') || '[]').length;
+                console.log(`📊 Sending ${entries.length} entries via email (Firebase: ${firebaseCount}, localStorage: ${localCount})`);
+                
+                
+                console.log(`📊 Sending ${entries.length} entries via email`);
+                
+                // Generate CSV content
+                const csvContent = generateCSV(entries);
+                
+                // Prepare email data to match the EmailJS template
+                const emailData = {
+                    title: `Complete data export with ${entries.length} contest entries`,
+                    name: 'Contest Admin Panel',
+                    time: new Date().toLocaleString(),
+                    subject: `📱 Contest Entries Export - ${entries.length} Entries - ${new Date().toLocaleDateString()}`,
+                    from_name: 'Contest Admin Panel',
+                    from_email: 'raghavsharma0411@gmail.com',
+                    message: formatCSVForEmailTemplate(entries, csvContent),
+                    email: 'raghavsharma0411@gmail.com',
+                    to_email: 'raghavsharma0411@gmail.com',
+                    entry_count: entries.length,
+                    export_date: new Date().toLocaleDateString(),
+                    export_time: new Date().toLocaleTimeString()
+                };
+                
+                // Send email using EmailJS
+                if (typeof emailjs === 'undefined') {
+                    throw new Error('EmailJS not available');
+                }
+                
+                await emailjs.send(
+                    ContestConfig.emailjs.serviceId, 
+                    ContestConfig.emailjs.templateId, 
+                    emailData
+                );
+                
+                showNotification(`Contest data emailed successfully! 📧 Summary + CSV data with ${entries.length} entries sent to raghavsharma0411@gmail.com`, 'success');
+                console.log('✅ CSV data sent via email successfully');
+                
+            } catch (error) {
+                console.error('❌ Email sending failed:', error);
+                
+                // Fallback to mailto
+                handleEmailCSVFallback(entries);
+                
+            } finally {
+                // Reset button state
+                emailBtn.innerHTML = originalText;
+                emailBtn.disabled = false;
+            }
+        }
+
+        function formatCSVForEmailTemplate(entries, csvContent) {
+            // For EmailJS template, create a simple text-based format that displays properly
+            let textContent = `CONTEST ENTRIES SUMMARY:\n`;
+            textContent += `========================\n\n`;
+            textContent += `Total Entries: ${entries.length}\n`;
+            textContent += `Export Date: ${new Date().toLocaleString()}\n\n`;
+            
+            if (entries.length > 0) {
+                textContent += `RECENT ENTRIES PREVIEW:\n`;
+                textContent += `----------------------\n`;
+                const recentEntries = entries.slice(-5);
+                recentEntries.forEach((entry, index) => {
+                    textContent += `${index + 1}. ${entry.firstName} ${entry.lastName}\n`;
+                    textContent += `   Email: ${entry.email}\n`;
+                    textContent += `   Mobile: ${entry.mobile}\n`;
+                    textContent += `   Device: ${entry.mobileModel}\n`;
+                    textContent += `   Location: ${entry.city}, ${entry.state}\n`;
+                    textContent += `   Date: ${new Date(entry.submissionDate).toLocaleDateString()}\n\n`;
+                });
+                
+                textContent += `\nCOMPLETE CSV DATA:\n`;
+                textContent += `==================\n`;
+                textContent += csvContent;
+                
+                textContent += `\n\nEND OF EXPORT\n`;
+                textContent += `=============\n`;
+                textContent += `This data can be copied and pasted directly into Excel or Google Sheets.\n`;
+                textContent += `For technical support, contact the contest administrator.`;
+            } else {
+                textContent += `No contest entries found.`;
+            }
+            
+            return textContent;
+        }
+
+        function formatCSVForEmail(entries, csvContent) {
+            const htmlTable = generateHTMLTable(entries);
+            
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+        .header p { margin: 0; opacity: 0.9; }
+        .summary { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-left: 5px solid #667eea; margin-bottom: 25px; border-radius: 8px; }
+        .summary h3 { margin-top: 0; color: #667eea; }
+        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13px; min-width: 1000px; }
+        th { background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%); color: white; padding: 15px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        td { padding: 12px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+        tr:nth-child(even) { background-color: #fafbfc; }
+        tr:hover { background-color: #f0f4ff; }
+        .footer { margin-top: 30px; padding: 20px; border-top: 2px solid #eee; color: #666; font-size: 12px; text-align: center; background: #f8f9fa; border-radius: 8px; }
+        .highlight { color: #667eea; font-weight: bold; }
+        .entry-count { font-size: 32px; font-weight: bold; color: #667eea; display: inline-block; background: white; padding: 5px 15px; border-radius: 25px; margin: 0 10px; }
+        .mobile-tag { background: #e3f2fd; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .email-link { color: #667eea; text-decoration: none; }
+        .email-link:hover { text-decoration: underline; }
+        .entry-id { font-family: 'Courier New', monospace; background: #f1f3f4; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 Contest Entries Export</h1>
+        <p>Complete data export from Contest Admin Panel</p>
+    </div>
+    
+    <div class="summary">
+        <h3>📊 Summary</h3>
+        <p><strong>Total Entries:</strong> <span class="entry-count">${entries.length}</span></p>
+        <p><strong>Export Date:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Generated by:</strong> Contest Admin Panel</p>
+    </div>
+    
+    <h3>📋 All Contest Entries</h3>
+    <div class="table-container">
+        ${htmlTable}
+    </div>
+    
+    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+        <h3 style="margin-top: 0; color: #667eea;">📄 Raw CSV Data</h3>
+        <p style="margin-bottom: 10px; color: #666; font-size: 14px;">Copy the data below for spreadsheet import:</p>
+        <div style="background: #ffffff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; overflow-x: auto;">
+            <pre style="margin: 0; font-family: 'Courier New', monospace; font-size: 12px; color: #333; white-space: pre-wrap; word-wrap: break-word;">${csvContent}</pre>
+        </div>
+        <p style="margin-top: 10px; margin-bottom: 0; color: #666; font-size: 12px;">
+            <strong>💡 Tip:</strong> You can copy this CSV data and paste it directly into Excel, Google Sheets, or any spreadsheet application.
+        </p>
+    </div>
+    
+    <div class="footer">
+        <p><strong>Contest Data Export</strong></p>
+        <p>This email contains both a formatted HTML table and raw CSV data for maximum flexibility.<br>
+        For any questions, please contact the contest administrator.</p>
+        <p><em>Export ID: ${Date.now()} | Entries: ${entries.length} | Format: HTML + CSV</em></p>
+    </div>
+</body>
+</html>
+            `.trim();
+            
+            return htmlContent;
+        }
+
+        function generateHTMLTableForEmail(entries) {
+            // Generate table for EmailJS template (simplified styling)
+            if (entries.length === 0) {
+                return '<p style="text-align: center; color: #666; padding: 20px;">No contest entries found.</p>';
+            }
+
+            const headers = [
+                'Entry ID', 'First Name', 'Last Name', 'Mobile', 'Email',
+                'Mobile Model', 'IMEI', 'Address', 'City', 'State',
+                'Country', 'PIN Code', 'Date', 'Time'
+            ];
+
+            let tableHTML = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px;">';
+            
+            // Table headers
+            tableHTML += '<thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th style="background: #667eea; color: white; padding: 10px 8px; text-align: left; font-weight: 600; font-size: 11px;">${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            // Table body
+            tableHTML += '<tbody>';
+            entries.forEach((entry, index) => {
+                const submissionDate = new Date(entry.submissionDate);
+                const formattedDate = formatDate(submissionDate);
+                const formattedTime = formatTime(submissionDate);
+                
+                const rowBg = index % 2 === 0 ? '#fafbfc' : '#ffffff';
+                
+                tableHTML += `<tr style="background-color: ${rowBg};">`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px; background: #f1f3f4; border-radius: 3px;">${entry.entryId}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.firstName}</strong></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.lastName}</strong></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.mobile}</strong></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${entry.email}" style="color: #667eea; text-decoration: none;">${entry.email}</a></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><span style="background: #e3f2fd; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${entry.mobileModel}</span></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 10px;">${entry.imei}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; font-size: 11px;">${entry.address}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.city}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.state}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${entry.country}</td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${entry.pincode}</strong></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #667eea;"><strong>${formattedDate}</strong></td>`;
+                tableHTML += `<td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">${formattedTime}</td>`;
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody>';
+            
+            tableHTML += '</table></div>';
+            
+            return tableHTML;
+        }
+
+        function generateHTMLTable(entries) {
+            if (entries.length === 0) {
+                return '<p style="text-align: center; color: #666; padding: 20px;">No contest entries found.</p>';
+            }
+
+            const headers = [
+                'Entry ID', 'First Name', 'Last Name', 'Mobile', 'Email',
+                'Mobile Model', 'IMEI', 'Address', 'City', 'State',
+                'Country', 'PIN Code', 'Date', 'Time'
+            ];
+
+            let tableHTML = '<table>';
+            
+            // Table headers
+            tableHTML += '<thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+            
+            // Table body
+            tableHTML += '<tbody>';
+            entries.forEach(entry => {
+                const submissionDate = new Date(entry.submissionDate);
+                const formattedDate = formatDate(submissionDate);
+                const formattedTime = formatTime(submissionDate);
+                
+                tableHTML += '<tr>';
+                tableHTML += `<td><span class="entry-id">${entry.entryId}</span></td>`;
+                tableHTML += `<td><strong>${entry.firstName}</strong></td>`;
+                tableHTML += `<td><strong>${entry.lastName}</strong></td>`;
+                tableHTML += `<td><strong>${entry.mobile}</strong></td>`;
+                tableHTML += `<td><a href="mailto:${entry.email}" class="email-link">${entry.email}</a></td>`;
+                tableHTML += `<td><span class="mobile-tag">${entry.mobileModel}</span></td>`;
+                tableHTML += `<td><code style="font-size: 11px; background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">${entry.imei}</code></td>`;
+                tableHTML += `<td><small>${entry.address}</small></td>`;
+                tableHTML += `<td>${entry.city}</td>`;
+                tableHTML += `<td>${entry.state}</td>`;
+                tableHTML += `<td>${entry.country}</td>`;
+                tableHTML += `<td><strong>${entry.pincode}</strong></td>`;
+                tableHTML += `<td><strong style="color: #667eea;">${formattedDate}</strong></td>`;
+                tableHTML += `<td style="color: #666;">${formattedTime}</td>`;
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody>';
+            
+            tableHTML += '</table>';
+            
+            return tableHTML;
+        }
+
+        function handleEmailCSVFallback(entries) {
+            try {
+                // For mailto fallback, use plain text format since HTML isn't supported
+                const csvContent = generateCSV(entries);
+                const plainTextContent = `
+Contest Entries Export - ${entries.length} Entries
+Export Date: ${new Date().toLocaleString()}
+Generated by: Contest Admin Panel
+
+SUMMARY:
+========
+Total Entries: ${entries.length}
+
+Recent Entries Preview:
+${entries.slice(-5).map((entry, index) => 
+    `${entries.length - 4 + index}. ${entry.firstName} ${entry.lastName} - ${entry.email} - ${entry.mobileModel}`
+).join('\n')}
+
+COMPLETE CSV DATA:
+==================
+${csvContent}
+
+END OF EXPORT
+=============
+This email was automatically generated by the Contest Admin Panel.
+Note: This plain text version is used as fallback when HTML email is not available.
+                `.trim();
+                
+                const subject = encodeURIComponent(`Contest Entries Export - ${entries.length} Entries - ${new Date().toLocaleDateString()}`);
+                const body = encodeURIComponent(plainTextContent);
+                
+                const mailtoLink = `mailto:raghavsharma0411@gmail.com?subject=${subject}&body=${body}`;
+                
+                // Create a temporary link to trigger mailto
+                const tempLink = document.createElement('a');
+                tempLink.href = mailtoLink;
+                tempLink.style.display = 'none';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                
+                showNotification('Opening email client with contest data... (Plain text format)', 'info');
+                
+            } catch (error) {
+                console.error('❌ Fallback email failed:', error);
+                showNotification('Failed to prepare email. Please try downloading the CSV instead.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
